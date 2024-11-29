@@ -25,10 +25,8 @@ import { CreateUserDto } from 'src/services/users-service/dtos/create-user.dto';
         );
         return users;
       } catch (error) {
-        throw new HttpException(
-          `Failed to retrieve users: ${error.message}`, 
-          HttpStatus.INTERNAL_SERVER_ERROR
-        );
+        console.log(error);
+        throw error
       }
     }
   

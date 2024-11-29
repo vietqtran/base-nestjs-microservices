@@ -33,7 +33,7 @@ dotenv.config();
         options: {
           client: {
             clientId: 'users-service',
-            brokers: [process.env.KAFKA_BROKER_URL ?? 'localhost:9092'],
+            brokers: [process.env.KAFKA_BROKER_URL],
           },
           consumer: {
             groupId: 'users-consumer-group'
