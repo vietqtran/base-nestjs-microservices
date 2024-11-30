@@ -1,10 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { ApiGatewayModule } from './api-gateway.module';
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
 import { ResponseParserInterceptor } from './shared/interceptors/response.interceptor';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-dotenv.config()
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule);
@@ -14,18 +15,36 @@ async function bootstrap() {
       client: {
         clientId: 'api-gateway',
         brokers: [process.env.KAFKA_BROKER_URL],
+        connectionTimeout: 5000,
+        retry: {
+          initialRetryTime: 1000,
+          retries: 5,
+        },
       },
       consumer: {
-        groupId: 'api-gateway-consumer-group'
-      }
-    }
+        groupId: 'api-gateway-consumer-group',
+        allowAutoTopicCreation: true,
+        sessionTimeout: 30000,
+      },
+    },
   });
 
   app.setGlobalPrefix('api');
 
   app.useGlobalInterceptors(new ResponseParserInterceptor());
 
+  const config = new DocumentBuilder()
+    .addBearerAuth()
+    .setTitle('API')
+    .setDescription('API description')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  app.enableCors();
+
   await app.startAllMicroservices();
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 8000);
 }
 bootstrap();

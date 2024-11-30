@@ -2,23 +2,29 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { CustomRpcException } from './exceptions/custom-rpc.exception';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @MessagePattern('get_all_users')
+  @MessagePattern('users.get-all')
   async getAllUsers() {
-    return this.usersService.findAll()
+    return this.usersService.findAll();
   }
 
-  @MessagePattern('create_user')
+  @MessagePattern('users.create')
   async createUser(@Payload() createUserDto: CreateUserDto) {
-    try {
-      return await this.usersService.create(createUserDto);
-    } catch (error) {
-      throw new Error(`Failed to create user: ${error.message}`);
-    }
+    return await this.usersService.create(createUserDto);
+  }
+
+  @MessagePattern('users.update')
+  async updateUser(@Payload() updateUserDto: UpdateUserDto) {
+    return await this.usersService.update(updateUserDto);
+  }
+
+  @MessagePattern('users.delete')
+  async deleteUser(@Payload() id: string) {
+    return await this.usersService.delete(id);
   }
 }

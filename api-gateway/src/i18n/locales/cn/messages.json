@@ -1,27 +1,29 @@
 {
-    "common": {
-      "fields": {
-        "confirm-password": "确认密码",
-        "email": "电子邮件",
-        "password": "密码",
-        "username": "用户名",
-        "system-error": "系统错误",
-        "refresh-token": "刷新令牌",
-        "user": "用户",
-        "file": "文件",
-        "token": "令牌",
-        "passkey": "passkey"
-      },
-      "errors": {
-        "wrong-credentials": "{field}错误。",
-        "not-match": "{field}不匹配。",
-        "existed": "{field}已存在。",
-        "create-user": "创建用户时发生系统错误，请稍后再试。",
-        "not-found": "未找到{field}。",
-        "missing-token": "缺少令牌。",
-        "invalid-token": "{field}无效。",
-        "system-error": "服务器内部错误，请稍后再试。"
-      }
+  "common": {
+    "errors": {
+      "create-user": "无法创建用户。",
+      "delete-user": "无法删除用户。",
+      "existed": "{field}已存在。",
+      "get-user": "无法访问用户",
+      "get-users": "无法访问用户。",
+      "invalid-token": "{field}无效。",
+      "missing-token": "缺少令牌。",
+      "not-found": "未找到{field}。",
+      "not-match": "{field}不匹配。",
+      "system-error": "服务器内部错误，请稍后再试。",
+      "wrong-credentials": "{field}错误。"
+    },
+    "fields": {
+      "confirm-password": "确认密码",
+      "email": "电子邮件",
+      "file": "文件",
+      "passkey": "passkey",
+      "password": "密码",
+      "refresh-token": "刷新令牌",
+      "system-error": "系统错误",
+      "token": "令牌",
+      "user": "用户",
+      "username": "用户名"
     }
   }
-  
+}

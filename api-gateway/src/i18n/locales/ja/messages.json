@@ -1,27 +1,29 @@
 {
-    "common": {
-      "fields": {
-        "confirm-password": "パスワード確認",
-        "email": "メール",
-        "password": "パスワード",
-        "username": "ユーザー名",
-        "system-error": "システムエラー",
-        "refresh-token": "リフレッシュトークン",
-        "user": "ユーザー",
-        "file": "ファイル",
-        "token": "トークン",
-        "passkey": "パスキー"
-      },
-      "errors": {
-        "wrong-credentials": "{field}が間違っています。",
-        "not-match": "{field}が一致しません。",
-        "existed": "{field}は既に存在しています。",
-        "create-user": "ユーザー作成中にシステムエラーが発生しました。後でもう一度お試しください。",
-        "not-found": "{field}が見つかりません。",
-        "missing-token": "トークンがありません。",
-        "invalid-token": "{field}が無効です。",
-        "system-error": "サーバーエラーが発生しました。後でもう一度お試しくじってください。"
-      }
+  "common": {
+    "errors": {
+      "create-user": "ユーザーを作成できません。",
+      "delete-user": "ユーザーを削除できません。",
+      "existed": "{field}は既に存在しています。",
+      "get-user": "ユーザーにアクセスできません。",
+      "get-users": "ユーザーにアクセスできません。",
+      "invalid-token": "{field}が無効です。",
+      "missing-token": "トークンがありません。",
+      "not-found": "{field}が見つかりません。",
+      "not-match": "{field}が一致しません。",
+      "system-error": "サーバーエラーが発生しました。後でもう一度お試しくじってください。",
+      "wrong-credentials": "{field}が間違っています。"
+    },
+    "fields": {
+      "confirm-password": "パスワード確認",
+      "email": "メール",
+      "file": "ファイル",
+      "passkey": "パスキー",
+      "password": "パスワード",
+      "refresh-token": "リフレッシュトークン",
+      "system-error": "システムエラー",
+      "token": "トークン",
+      "user": "ユーザー",
+      "username": "ユーザー名"
     }
   }
-  
+}

@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UsersController } from './services/users-service/users.controller';
 import { CLIENT_KAFKA_OPTIONS } from './constants';
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
 import { I18nConfigModule } from './i18n/i18n.module';
 
-dotenv.config()
+dotenv.config();
 
 @Module({
   imports: [
@@ -19,12 +19,12 @@ dotenv.config()
             brokers: [process.env.KAFKA_BROKER_URL],
           },
           consumer: {
-            groupId: CLIENT_KAFKA_OPTIONS.users.groupId
-          }
-        }
-      }
+            groupId: CLIENT_KAFKA_OPTIONS.users.groupId,
+          },
+        },
+      },
     ]),
-    I18nConfigModule
+    I18nConfigModule,
   ],
   controllers: [UsersController],
 })

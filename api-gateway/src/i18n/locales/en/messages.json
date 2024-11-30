@@ -1,27 +1,29 @@
 {
-    "common": {
-      "fields": {
-        "confirm-password": "confirm password",
-        "email": "email",
-        "password": "password",
-        "username": "username",
-        "system-error": "system error",
-        "refresh-token": "refresh token",
-        "user": "user",
-        "file": "file",
-        "token": "token",
-        "passkey": "passkey"
-      },
-      "errors": {
-        "wrong-credentials": "{field} is wrong.",
-        "not-match": "{field} does not match.",
-        "existed": "{field} already exists.",
-        "create-user": "A system error occurred while creating a user. Please try again later.",
-        "not-found": "{field} not found.",
-        "missing-token": "Missing token.",
-        "invalid-token": "{field} is invalid.",
-        "system-error": "An error occurred on the server. Please try again later."
-      }
+  "common": {
+    "errors": {
+      "create-user": "Can't create user.",
+      "delete-user": "Can't delete user.",
+      "existed": "{field} already exists.",
+      "get-user": "Can't get user.",
+      "get-users": "Can't get users.",
+      "invalid-token": "{field} is invalid.",
+      "missing-token": "Missing token.",
+      "not-found": "{field} not found.",
+      "not-match": "{field} does not match.",
+      "system-error": "An error occurred on the server. Please try again later.",
+      "wrong-credentials": "{field} is wrong."
+    },
+    "fields": {
+      "confirm-password": "confirm password",
+      "email": "email",
+      "file": "file",
+      "passkey": "passkey",
+      "password": "password",
+      "refresh-token": "refresh token",
+      "system-error": "system error",
+      "token": "token",
+      "user": "user",
+      "username": "username"
     }
   }
-  
+}

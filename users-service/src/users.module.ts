@@ -21,7 +21,7 @@ dotenv.config();
       useFactory: (config: ConfigService) => {
         return {
           uri: config.get<string>('MONGO_URI'),
-        }
+        };
       },
       inject: [ConfigService],
     }),
@@ -36,11 +36,11 @@ dotenv.config();
             brokers: [process.env.KAFKA_BROKER_URL],
           },
           consumer: {
-            groupId: 'users-consumer-group'
-          }
-        }
-      }
-    ])
+            groupId: 'users-consumer-group',
+          },
+        },
+      },
+    ]),
   ],
   controllers: [UsersController],
   providers: [UsersService],
