@@ -6,6 +6,7 @@
       "existed": "{field}已存在。",
       "get-user": "无法访问用户",
       "get-users": "无法访问用户。",
+      "invalid": "{field}无效。",
       "invalid-token": "{field}无效。",
       "missing-token": "缺少令牌。",
       "not-found": "未找到{field}。",
@@ -17,13 +18,15 @@
       "confirm-password": "确认密码",
       "email": "电子邮件",
       "file": "文件",
+      "id": "ID",
       "passkey": "passkey",
       "password": "密码",
       "refresh-token": "刷新令牌",
       "system-error": "系统错误",
       "token": "令牌",
       "user": "用户",
-      "username": "用户名"
+      "username": "用户名",
+      "session": "会话"
     }
   }
 }

@@ -6,6 +6,7 @@
       "existed": "{field} already exists.",
       "get-user": "Can't get user.",
       "get-users": "Can't get users.",
+      "invalid": "{field} is invalid.",
       "invalid-token": "{field} is invalid.",
       "missing-token": "Missing token.",
       "not-found": "{field} not found.",
@@ -17,13 +18,15 @@
       "confirm-password": "confirm password",
       "email": "email",
       "file": "file",
+      "id": "ID",
       "passkey": "passkey",
       "password": "password",
       "refresh-token": "refresh token",
       "system-error": "system error",
       "token": "token",
       "user": "user",
-      "username": "username"
+      "username": "username",
+      "session": "session"
     }
   }
 }

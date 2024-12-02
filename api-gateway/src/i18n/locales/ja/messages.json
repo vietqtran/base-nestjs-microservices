@@ -6,6 +6,7 @@
       "existed": "{field}は既に存在しています。",
       "get-user": "ユーザーにアクセスできません。",
       "get-users": "ユーザーにアクセスできません。",
+      "invalid": "{field}が無効です。",
       "invalid-token": "{field}が無効です。",
       "missing-token": "トークンがありません。",
       "not-found": "{field}が見つかりません。",
@@ -17,13 +18,15 @@
       "confirm-password": "パスワード確認",
       "email": "メール",
       "file": "ファイル",
+      "id": "ID",
       "passkey": "パスキー",
       "password": "パスワード",
       "refresh-token": "リフレッシュトークン",
       "system-error": "システムエラー",
       "token": "トークン",
       "user": "ユーザー",
-      "username": "ユーザー名"
+      "username": "ユーザー名",
+      "session": "セッション"
     }
   }
 }

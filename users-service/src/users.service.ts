@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './schemas/user.schema';
 import { CustomRpcException } from './exceptions/custom-rpc.exception';
@@ -17,6 +17,38 @@ export class UsersService {
       return this.userModel.find();
     } catch (error) {
       console.error('!!! ERROR: Error at users.service.findAll');
+      throw new CustomRpcException(
+        error.message ?? 'Failed to get users',
+        400,
+        {
+          field: 'user',
+          message: 'get-users',
+        },
+      );
+    }
+  }
+
+  async findById(id: string): Promise<User> {
+    try {
+      return this.userModel.findById(id);
+    } catch (error) {
+      console.error('!!! ERROR: Error at users.service.findById');
+      throw new CustomRpcException(
+        error.message ?? 'Failed to get user',
+        400,
+        {
+          field: 'user',
+          message: 'get-user',
+        },
+      );
+    }
+  }
+
+  async findByFilter(filter: FilterQuery<User>): Promise<User[]> {
+    try {
+      return this.userModel.find(filter);
+    } catch (error) {
+      console.error('!!! ERROR: Error at users.service.findByFilter');
       throw new CustomRpcException(
         error.message ?? 'Failed to get users',
         400,

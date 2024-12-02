@@ -6,6 +6,7 @@
       "existed": "{field} này đã tồn tại.",
       "get-user": "Không thể truy suất người dùng.",
       "get-users": "Không thể truy suất người dùng.",
+      "invalid": "{field} không hợp lệ.",
       "invalid-token": "{field} không hợp lệ.",
       "missing-token": "Thiếu token.",
       "not-found": "Không tìm thấy {field}.",
@@ -17,13 +18,15 @@
       "confirm-password": "xác nhận mật khẩu",
       "email": "email",
       "file": "file",
+      "id": "ID",
       "passkey": "passkey",
       "password": "mật khẩu",
       "refresh-token": "refresh token",
       "system-error": "lỗi hệ thống",
       "token": "token",
       "user": "người dùng",
-      "username": "tên người dùng"
+      "username": "tên người dùng",
+      "session": "phiên đăng nhập"
     }
   }
 }

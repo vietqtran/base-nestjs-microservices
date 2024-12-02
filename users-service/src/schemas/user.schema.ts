@@ -108,11 +108,14 @@ export class User {
   @Transform(({ value }) => value.toString())
   _id?: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, index: true })
   username: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, index: true })
   email: string;
+
+  @Prop({ required: false, default: ['BASIC_USER'] })
+  roles?: string[];
 
   @Prop({ required: false })
   @IsObject()

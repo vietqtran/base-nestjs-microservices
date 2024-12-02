@@ -12,6 +12,7 @@ import { Inject } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { CreateUserDto } from 'src/services/users-service/dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { ParseObjectIdPipe } from 'src/shared/pipes/object-id.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -23,6 +24,12 @@ export class UsersController {
     return users;
   }
 
+  @Get(':id')
+  async getUserById(@Param('id', ParseObjectIdPipe) id: string) {
+    const user = await firstValueFrom(this.client.send('users.get-by-id', id));
+    return user;
+  }
+
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
     const user = await firstValueFrom(
@@ -32,7 +39,7 @@ export class UsersController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Param('id', ParseObjectIdPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
     const user = await firstValueFrom(
       this.client.send('users.update', { id, payload: updateUserDto }),
     );
@@ -40,7 +47,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@Param('id', ParseObjectIdPipe) id: string) {
     const user = await firstValueFrom(this.client.send('users.delete', id));
     return user;
   }
@@ -51,6 +58,7 @@ export class UsersController {
       'users.create',
       'users.update',
       'users.delete',
+      'users.get-by-id',
     ];
     topics.forEach((topic) => this.client.subscribeToResponseOf(topic));
   }
