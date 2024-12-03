@@ -1,4 +1,8 @@
-import { Controller } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  UseInterceptors,
+} from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -12,7 +16,7 @@ export class UsersController {
 
   @MessagePattern('users.get-all')
   async getAllUsers() {
-    return this.usersService.findAll();
+    return await this.usersService.findAll();
   }
 
   @MessagePattern('users.get-by-id')

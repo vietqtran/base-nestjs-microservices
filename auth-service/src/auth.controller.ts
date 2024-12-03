@@ -9,7 +9,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @MessagePattern('auth.validate-user')
-  async validateUser(@Payload() email: string, @Payload() password: string) {
+  async validateUser(
+    @Payload() { email, password }: { email: string; password: string },
+  ) {
     return await this.authService.validateUser(email, password);
   }
 
@@ -26,5 +28,15 @@ export class AuthController {
   @MessagePattern('auth.get-session-by-id')
   async getSessionById(@Payload() sessionId: string) {
     return await this.authService.getSessionById(sessionId);
+  }
+
+  @MessagePattern('auth.get-all-user-credentials')
+  async getAllUserCredentials() {
+    return await this.authService.getAllUserCredentials();
+  }
+
+  @MessagePattern('auth.get-all-sessions')
+  async getAllSessions() {
+    return await this.authService.getAllSessions();
   }
 }

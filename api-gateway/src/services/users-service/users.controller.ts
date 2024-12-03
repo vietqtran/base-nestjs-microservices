@@ -21,6 +21,7 @@ export class UsersController {
   @Get()
   async getAllUsers() {
     const users = await firstValueFrom(this.client.send('users.get-all', {}));
+    console.log(users);
     return users;
   }
 
@@ -39,7 +40,10 @@ export class UsersController {
   }
 
   @Put(':id')
-  async update(@Param('id', ParseObjectIdPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     const user = await firstValueFrom(
       this.client.send('users.update', { id, payload: updateUserDto }),
     );

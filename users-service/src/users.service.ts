@@ -14,7 +14,9 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     try {
-      return this.userModel.find();
+      const users = await this.userModel.find({});
+      console.log(users);
+      return users;
     } catch (error) {
       console.error('!!! ERROR: Error at users.service.findAll');
       throw new CustomRpcException(
@@ -30,23 +32,21 @@ export class UsersService {
 
   async findById(id: string): Promise<User> {
     try {
-      return this.userModel.findById(id);
+      const user = await this.userModel.findById(id);
+      return user.toObject();
     } catch (error) {
       console.error('!!! ERROR: Error at users.service.findById');
-      throw new CustomRpcException(
-        error.message ?? 'Failed to get user',
-        400,
-        {
-          field: 'user',
-          message: 'get-user',
-        },
-      );
+      throw new CustomRpcException(error.message ?? 'Failed to get user', 400, {
+        field: 'user',
+        message: 'get-user',
+      });
     }
   }
 
   async findByFilter(filter: FilterQuery<User>): Promise<User[]> {
     try {
-      return this.userModel.find(filter);
+      const users = await this.userModel.find(filter);
+      return users;
     } catch (error) {
       console.error('!!! ERROR: Error at users.service.findByFilter');
       throw new CustomRpcException(

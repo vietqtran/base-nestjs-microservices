@@ -4,6 +4,7 @@ import { ApiGatewayModule } from './api-gateway.module';
 import * as dotenv from 'dotenv';
 import { ResponseParserInterceptor } from './shared/interceptors/response.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 dotenv.config();
 
@@ -30,8 +31,8 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
-
   app.useGlobalInterceptors(new ResponseParserInterceptor());
+  app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
     .addBearerAuth()
