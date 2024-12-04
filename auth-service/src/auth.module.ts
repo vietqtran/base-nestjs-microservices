@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 import { AuthController } from './auth.controller';
@@ -76,4 +76,17 @@ dotenv.config();
   controllers: [AuthController],
   providers: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule {
+  constructor(
+    @Inject('USERS_SERVICE') private readonly usersClient: ClientKafka,
+  ) {}
+
+  async onModuleInit() {
+    const topics = ['users.get-by-id', 'users.get-by-filter', 'users.create'];
+    topics.forEach((topic) => this.usersClient.subscribeToResponseOf(topic));
+
+    Promise.all([this.usersClient.connect()]).then(() => {
+      console.log('Connected to Kafka');
+    });
+  }
+}

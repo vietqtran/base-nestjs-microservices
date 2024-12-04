@@ -1,10 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { ApiGatewayModule } from './api-gateway.module';
 import * as dotenv from 'dotenv';
 import { ResponseParserInterceptor } from './shared/interceptors/response.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import JwtAuthGuard from './shared/guards/jwt.guard';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalInterceptors(new ResponseParserInterceptor());
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalGuards(new JwtAuthGuard(app.get(Reflector)));
 
   const config = new DocumentBuilder()
     .addBearerAuth()

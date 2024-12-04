@@ -13,15 +13,20 @@ import { firstValueFrom } from 'rxjs';
 import { CreateUserDto } from 'src/services/users-service/dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/object-id.pipe';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
 
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  constructor(@Inject('USERS_SERVICE') private readonly client: ClientKafka) {}
+  constructor(
+    @Inject(CLIENT_KAFKA_OPTIONS.users.name)
+    private readonly client: ClientKafka,
+  ) {}
 
   @Get()
   async getAllUsers() {
     const users = await firstValueFrom(this.client.send('users.get-all', {}));
-    console.log(users);
     return users;
   }
 
@@ -54,16 +59,5 @@ export class UsersController {
   async deleteUser(@Param('id', ParseObjectIdPipe) id: string) {
     const user = await firstValueFrom(this.client.send('users.delete', id));
     return user;
-  }
-
-  onModuleInit() {
-    const topics = [
-      'users.get-all',
-      'users.create',
-      'users.update',
-      'users.delete',
-      'users.get-by-id',
-    ];
-    topics.forEach((topic) => this.client.subscribeToResponseOf(topic));
   }
 }

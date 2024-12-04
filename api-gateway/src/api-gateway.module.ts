@@ -1,15 +1,23 @@
-import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { Inject, Module } from '@nestjs/common';
+import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
 import { UsersController } from './services/users-service/users.controller';
 import { CLIENT_KAFKA_OPTIONS } from './constants';
 import * as dotenv from 'dotenv';
 import { I18nConfigModule } from './i18n/i18n.module';
 import { AuthController } from './services/auth-service/auth.controller';
+import { LocalStrategy } from './shared/strategies/local.strategy';
+import { JwtStrategy } from './shared/strategies/jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
 
 dotenv.config();
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      load: [],
+      isGlobal: true,
+      expandVariables: true,
+    }),
     ClientsModule.register([
       {
         name: CLIENT_KAFKA_OPTIONS.users.name,
@@ -41,5 +49,46 @@ dotenv.config();
     I18nConfigModule,
   ],
   controllers: [UsersController, AuthController],
+  providers: [
+    LocalStrategy,
+    JwtStrategy,
+    // JwtRefreshStrategy,
+  ],
 })
-export class ApiGatewayModule {}
+export class ApiGatewayModule {
+  constructor(
+    @Inject(CLIENT_KAFKA_OPTIONS.users.name)
+    private readonly usersClient: ClientKafka,
+    @Inject(CLIENT_KAFKA_OPTIONS.auth.name)
+    private readonly authClient: ClientKafka,
+  ) {}
+
+  async onModuleInit() {
+    const usersTopics = [
+      'users.get-all',
+      'users.create',
+      'users.update',
+      'users.delete',
+      'users.get-by-id',
+    ];
+    const authTopics = [
+      'auth.validate-user',
+      'auth.login',
+      'auth.sign-up',
+      'auth.get-session-by-id',
+      'auth.get-all-user-credentials',
+      'auth.get-all-sessions',
+    ];
+
+    usersTopics.forEach((topic) =>
+      this.usersClient.subscribeToResponseOf(topic),
+    );
+    authTopics.forEach((topic) => this.authClient.subscribeToResponseOf(topic));
+
+    Promise.all([this.usersClient.connect(), this.authClient.connect()]).then(
+      () => {
+        console.log('Connected to Kafka');
+      },
+    );
+  }
+}

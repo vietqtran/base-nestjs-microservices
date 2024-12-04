@@ -15,7 +15,6 @@ export class UsersService {
   async findAll(): Promise<User[]> {
     try {
       const users = await this.userModel.find({});
-      console.log(users);
       return users;
     } catch (error) {
       console.error('!!! ERROR: Error at users.service.findAll');

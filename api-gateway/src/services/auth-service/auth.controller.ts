@@ -5,11 +5,19 @@ import { SignInDto } from './dtos/sign-in.dto';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/object-id.pipe';
 import { ValidateDto } from './dtos/validate.dto';
+import { Public } from 'src/shared/decorators/public.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
 
+@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
-  constructor(@Inject('AUTH_SERVICE') private readonly client: ClientKafka) {}
+  constructor(
+    @Inject(CLIENT_KAFKA_OPTIONS.auth.name)
+    private readonly client: ClientKafka,
+  ) {}
 
+  @Public()
   @Post('validate')
   async validateUser(@Body() validateDto: ValidateDto) {
     const { email, password } = validateDto;
@@ -19,6 +27,7 @@ export class AuthController {
     return user;
   }
 
+  @Public()
   @Post('sign-in')
   async login(@Body() signInDto: SignInDto) {
     const response = await firstValueFrom(
@@ -27,6 +36,7 @@ export class AuthController {
     return response;
   }
 
+  @Public()
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
     const user = await firstValueFrom(
@@ -57,17 +67,5 @@ export class AuthController {
       this.client.send('auth.get-all-user-credentials', {}),
     );
     return userCredentials;
-  }
-
-  onModuleInit() {
-    const topics = [
-      'auth.validate-user',
-      'auth.login',
-      'auth.sign-up',
-      'auth.get-session-by-id',
-      'auth.get-all-user-credentials',
-      'auth.get-all-sessions',
-    ];
-    topics.forEach((topic) => this.client.subscribeToResponseOf(topic));
   }
 }

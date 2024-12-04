@@ -234,9 +234,4 @@ export class AuthService {
     const sessions = await this.sessionModel.find();
     return sessions;
   }
-
-  onModuleInit() {
-    const topics = ['users.get-by-id', 'users.get-by-filter', 'users.create'];
-    topics.forEach((topic) => this.usersService.subscribeToResponseOf(topic));
-  }
 }

@@ -1,37 +1,30 @@
-// import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { TokenPayload } from '../interfaces/token-payload.interface';
+import { ClientKafka } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
 
-// import { ConfigService } from '@nestjs/config';
-// import { HttpStatus, Injectable } from '@nestjs/common';
-// import { PassportStrategy } from '@nestjs/passport';
-// import { TokenPayload } from '../interfaces/token-payload.interface';
-// import { CustomHttpException } from '@/common/exceptions/custom-http.exception';
-// import { InjectModel } from '@nestjs/mongoose';
-// import { User } from '@/modules/users/schemas/user.schema';
-// import { Model } from 'mongoose';
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(CLIENT_KAFKA_OPTIONS.users.name)
+    private readonly usersService: ClientKafka,
+  ) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: configService.get<string>('JWT_SECRET'),
+    });
+  }
 
-// @Injectable()
-// export class JwtStrategy extends PassportStrategy(Strategy) {
-//   constructor(
-//     private readonly configService: ConfigService,
-//     @InjectModel(User.name) private readonly userModel: Model<User>,
-//   ) {
-//     super({
-//       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-//       ignoreExpiration: false,
-//       secretOrKey: configService.get<string>('JWT_SECRET'),
-//     });
-//   }
-
-//   async validate(payload: TokenPayload) {
-//     const user = await this.userModel
-//       .findOne({ _id: payload.sub })
-//       .select('-sessions');
-//     if (!user) {
-//       throw new CustomHttpException('User not found', HttpStatus.NOT_FOUND, {
-//         field: 'user',
-//         message: 'not-found',
-//       });
-//     }
-//     return user;
-//   }
-// }
+  async validate(payload: TokenPayload) {
+    const user = await firstValueFrom(
+      this.usersService.send('users.get-by-id', payload.sub),
+    );
+    return user;
+  }
+}

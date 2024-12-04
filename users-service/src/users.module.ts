@@ -45,4 +45,12 @@ dotenv.config();
   controllers: [UsersController],
   providers: [UsersService],
 })
-export class UsersModule {}
+export class UsersModule {
+  constructor() {}
+
+  async onModuleInit() {
+    Promise.all([]).then(() => {
+      console.log('Connected to Kafka');
+    });
+  }
+}

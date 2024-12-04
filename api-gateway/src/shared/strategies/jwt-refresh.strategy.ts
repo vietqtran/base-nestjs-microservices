@@ -6,8 +6,6 @@
 // import { JwtService } from '@nestjs/jwt';
 // import { TokenPayload } from '../interfaces/token-payload.interface';
 // import { Model } from 'mongoose';
-// import { User } from '@/modules/users/schemas/user.schema';
-// import { InjectModel } from '@nestjs/mongoose';
 // import { Session } from '@/modules/sessions/schemas/session.schema';
 
 // @Injectable()
