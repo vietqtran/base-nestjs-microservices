@@ -6,6 +6,7 @@ import { ResponseParserInterceptor } from './shared/interceptors/response.interc
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import JwtAuthGuard from './shared/guards/jwt.guard';
+import { KafkaExceptionFilter } from './shared/filters/exception.filter';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseParserInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalGuards(new JwtAuthGuard(app.get(Reflector)));
+  app.useGlobalFilters(new KafkaExceptionFilter());
 
   const config = new DocumentBuilder()
     .addBearerAuth()

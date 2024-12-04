@@ -26,22 +26,26 @@ export class UsersController {
 
   @Get()
   async getAllUsers() {
-    const users = await firstValueFrom(this.client.send('users.get-all', {}));
-    return users;
+    const response = await firstValueFrom(
+      this.client.send('users.get-all', {}),
+    );
+    return response;
   }
 
   @Get(':id')
   async getUserById(@Param('id', ParseObjectIdPipe) id: string) {
-    const user = await firstValueFrom(this.client.send('users.get-by-id', id));
-    return user;
+    const response = await firstValueFrom(
+      this.client.send('users.get-by-id', id),
+    );
+    return response;
   }
 
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
-    const user = await firstValueFrom(
+    const response = await firstValueFrom(
       this.client.send('users.create', createUserDto),
     );
-    return user;
+    return response;
   }
 
   @Put(':id')
@@ -49,15 +53,15 @@ export class UsersController {
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const user = await firstValueFrom(
+    const response = await firstValueFrom(
       this.client.send('users.update', { id, payload: updateUserDto }),
     );
-    return user;
+    return response;
   }
 
   @Delete(':id')
   async deleteUser(@Param('id', ParseObjectIdPipe) id: string) {
-    const user = await firstValueFrom(this.client.send('users.delete', id));
-    return user;
+    const response = await firstValueFrom(this.client.send('users.delete', id));
+    return response;
   }
 }

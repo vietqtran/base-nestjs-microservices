@@ -25,6 +25,16 @@ export class AuthController {
     return await this.authService.signUp(signUpDto);
   }
 
+  @MessagePattern('auth.refresh-token')
+  async refreshToken(
+    @Payload() refreshTokenDto: { userId: string; sessionId: string },
+  ) {
+    return await this.authService.refreshToken(
+      refreshTokenDto.userId,
+      refreshTokenDto.sessionId,
+    );
+  }
+
   @MessagePattern('auth.get-session-by-id')
   async getSessionById(@Payload() sessionId: string) {
     return await this.authService.getSessionById(sessionId);

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { SignInDto } from './dtos/sign-in.dto';
@@ -8,6 +16,9 @@ import { ValidateDto } from './dtos/validate.dto';
 import { Public } from 'src/shared/decorators/public.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
+import { RefreshTokenDto } from './dtos/refresh-token.dto';
+import JwtRefreshGuard from 'src/shared/guards/jwt-refresh.guard';
+import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
 
 @ApiBearerAuth()
 @Controller('auth')
@@ -21,10 +32,10 @@ export class AuthController {
   @Post('validate')
   async validateUser(@Body() validateDto: ValidateDto) {
     const { email, password } = validateDto;
-    const user = await firstValueFrom(
+    const response = await firstValueFrom(
       this.client.send('auth.validate-user', { email, password }),
     );
-    return user;
+    return response;
   }
 
   @Public()
@@ -39,18 +50,34 @@ export class AuthController {
   @Public()
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
-    const user = await firstValueFrom(
+    const response = await firstValueFrom(
       this.client.send('auth.sign-up', signUpDto),
     );
-    return user;
+    return response;
+  }
+
+  @Public()
+  @UseGuards(JwtRefreshGuard)
+  @Post('refresh-token')
+  async refreshToken(
+    @CurrentUser() payload: any,
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ) {
+    const response = await firstValueFrom(
+      this.client.send('auth.refresh-token', {
+        userId: payload.userId,
+        sessionId: payload.sessionId,
+      }),
+    );
+    return response;
   }
 
   @Post('session/:id')
   async getSessionById(@Param('id', ParseObjectIdPipe) sessionId: string) {
-    const session = await firstValueFrom(
+    const response = await firstValueFrom(
       this.client.send('auth.get-session-by-id', sessionId),
     );
-    return session;
+    return response;
   }
 
   @Get('sessions')
@@ -63,9 +90,9 @@ export class AuthController {
 
   @Get('user-credentials')
   async getAllUserCredentials() {
-    const userCredentials = await firstValueFrom(
+    const response = await firstValueFrom(
       this.client.send('auth.get-all-user-credentials', {}),
     );
-    return userCredentials;
+    return response;
   }
 }

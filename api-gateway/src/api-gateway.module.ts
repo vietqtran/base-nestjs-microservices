@@ -8,6 +8,7 @@ import { AuthController } from './services/auth-service/auth.controller';
 import { LocalStrategy } from './shared/strategies/local.strategy';
 import { JwtStrategy } from './shared/strategies/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
+import { JwtRefreshStrategy } from './shared/strategies/jwt-refresh.strategy';
 
 dotenv.config();
 
@@ -49,11 +50,7 @@ dotenv.config();
     I18nConfigModule,
   ],
   controllers: [UsersController, AuthController],
-  providers: [
-    LocalStrategy,
-    JwtStrategy,
-    // JwtRefreshStrategy,
-  ],
+  providers: [LocalStrategy, JwtStrategy, JwtRefreshStrategy],
 })
 export class ApiGatewayModule {
   constructor(
@@ -75,6 +72,7 @@ export class ApiGatewayModule {
       'auth.validate-user',
       'auth.login',
       'auth.sign-up',
+      'auth.refresh-token',
       'auth.get-session-by-id',
       'auth.get-all-user-credentials',
       'auth.get-all-sessions',

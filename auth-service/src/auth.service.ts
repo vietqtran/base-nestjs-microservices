@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserCredentials } from './schemas/user-credentials.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Session } from './schemas/session.schema';
 import { ClientKafka } from '@nestjs/microservices';
 import { CustomRpcException } from './exceptions/custom-rpc.exception';
-import * as bcrypt from 'bcrypt';
 import { firstValueFrom } from 'rxjs';
 import { SignInDto } from './dtos/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SignUpDto } from './dtos/sign-up.dto';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -38,9 +38,9 @@ export class AuthService {
       });
     }
 
-    const isMatched = await bcrypt.compare(
-      password,
+    const isMatched = await argon2.verify(
       userCredentials.hashed_password,
+      password,
     );
     if (!isMatched) {
       console.error(
@@ -76,10 +76,15 @@ export class AuthService {
       credentials.email,
       credentials.password,
     );
-    const accessToken = await this.generateToken(user, 'access');
-    const refreshToken = await this.generateToken(user, 'refresh');
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const sessionId = new Types.ObjectId().toString();
+    const accessToken = await this.generateToken({ user, sessionId }, 'access');
+    const refreshToken = await this.generateToken(
+      { user, sessionId },
+      'refresh',
+    );
+    const hashedRefreshToken = await argon2.hash(refreshToken);
     const sessionData = {
+      _id: sessionId,
       user_id: user._id,
       hashed_refresh_token: hashedRefreshToken,
       ip: session.ip,
@@ -99,7 +104,6 @@ export class AuthService {
       user,
       accessToken,
       refreshToken,
-      sessionId: createdSession.toObject()._id,
     };
   }
 
@@ -153,7 +157,7 @@ export class AuthService {
       });
     }
 
-    const hashed_password = await bcrypt.hash(password, 10);
+    const hashed_password = await argon2.hash(password);
     const createdUserCredentials = await this.userCredentialsModel.create({
       user_id: createdUser._id,
       email,
@@ -174,7 +178,31 @@ export class AuthService {
     return createdUser;
   }
 
-  async generateToken(user: any, type: 'refresh' | 'access') {
+  async refreshToken(userId: string, sessionId: string) {
+    const user = await firstValueFrom(
+      this.usersService.send('users.get-by-id', userId),
+    );
+
+    const accessToken = await this.generateToken({ user, sessionId }, 'access');
+    const refreshToken = await this.generateToken(
+      { user, sessionId },
+      'refresh',
+    );
+
+    const hashRefreshToken = await argon2.hash(refreshToken);
+    await this.sessionModel.updateOne(
+      { _id: sessionId },
+      { hashed_refresh_token: hashRefreshToken },
+    );
+
+    return {
+      user,
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async generateToken({ user, sessionId }: any, type: 'refresh' | 'access') {
     try {
       switch (type) {
         case 'access':
@@ -183,6 +211,11 @@ export class AuthService {
             email: user.email,
             username: user.username,
             roles: user.roles,
+            sessionId,
+            expiredAt: new Date(
+              Date.now() +
+                parseInt(`${this.configService.get<string>('JWT_EXPIRE_IN')}`),
+            ).toISOString(),
           });
           return accessToken;
         case 'refresh':
@@ -192,6 +225,13 @@ export class AuthService {
               email: user.email,
               username: user.username,
               roles: user.roles,
+              sessionId,
+              expiredAt: new Date(
+                Date.now() +
+                  parseInt(
+                    `${this.configService.get<string>('JWT_REFRESH_EXPIRE_IN')}`,
+                  ),
+              ).toISOString(),
             },
             {
               secret: this.configService.get<string>('JWT_REFRESH_SECRET'),

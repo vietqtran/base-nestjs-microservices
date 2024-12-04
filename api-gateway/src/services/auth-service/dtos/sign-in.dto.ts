@@ -3,7 +3,7 @@ import { IsBoolean, IsEmail, IsObject, IsString } from 'class-validator';
 
 class Credentials {
   @ApiProperty({
-    example: 'email@domain.com',
+    example: 'email@gmail.com',
   })
   @IsString()
   @IsEmail()

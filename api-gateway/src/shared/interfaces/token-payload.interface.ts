@@ -3,4 +3,6 @@ export interface TokenPayload {
   username: string;
   email: string;
   roles: string[];
+  sessionId: string;
+  expiredAt: string;
 }
