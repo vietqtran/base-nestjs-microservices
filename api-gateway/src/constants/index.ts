@@ -1,6 +1,7 @@
 export enum CLIENT_NAMES {
   USERS_SERVICE = 'USERS_SERVICE',
   AUTH_SERVICE = 'AUTH_SERVICE',
+  IDENTITY_SERVICE = 'IDENTITY_SERVICE'
 }
 
 export const CLIENT_KAFKA_OPTIONS = {
@@ -13,6 +14,11 @@ export const CLIENT_KAFKA_OPTIONS = {
     name: CLIENT_NAMES.AUTH_SERVICE,
     clientId: 'api-gateway-auth',
     groupId: 'api-gateway-auth-consumer-group',
+  },
+  identity: {
+    name: CLIENT_NAMES.IDENTITY_SERVICE,
+    clientId: 'api-gateway-identity',
+    groupId: 'api-gateway-identity-consumer-group',
   },
 };
 

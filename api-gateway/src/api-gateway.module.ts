@@ -46,6 +46,19 @@ dotenv.config();
           },
         },
       },
+      {
+        name: CLIENT_KAFKA_OPTIONS.identity.name,
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: CLIENT_KAFKA_OPTIONS.identity.clientId,
+            brokers: [process.env.KAFKA_BROKER_URL],
+          },
+          consumer: {
+            groupId: CLIENT_KAFKA_OPTIONS.identity.groupId,
+          },
+        },
+      },
     ]),
     I18nConfigModule,
   ],
@@ -58,6 +71,8 @@ export class ApiGatewayModule {
     private readonly usersClient: ClientKafka,
     @Inject(CLIENT_KAFKA_OPTIONS.auth.name)
     private readonly authClient: ClientKafka,
+    @Inject(CLIENT_KAFKA_OPTIONS.identity.name)
+    private readonly identityClient: ClientKafka,
   ) {}
 
   async onModuleInit() {
@@ -77,13 +92,15 @@ export class ApiGatewayModule {
       'auth.get-all-user-credentials',
       'auth.get-all-sessions',
     ];
+    const identityTopics = []
 
     usersTopics.forEach((topic) =>
       this.usersClient.subscribeToResponseOf(topic),
     );
     authTopics.forEach((topic) => this.authClient.subscribeToResponseOf(topic));
+    identityTopics.forEach((topic) => this.identityClient.subscribeToResponseOf(topic));
 
-    Promise.all([this.usersClient.connect(), this.authClient.connect()]).then(
+    Promise.all([this.usersClient.connect(), this.authClient.connect(), this.identityClient.connect()]).then(
       () => {
         console.log('Connected to Kafka');
       },
