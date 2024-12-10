@@ -205,7 +205,7 @@ export class AuthService {
   async generateToken({ user, sessionId }: any, type: 'refresh' | 'access') {
     try {
       switch (type) {
-        case 'access':
+        case 'access': {
           const accessToken = await this.jwtService.signAsync({
             sub: user._id,
             email: user.email,
@@ -217,8 +217,10 @@ export class AuthService {
                 parseInt(`${this.configService.get<string>('JWT_EXPIRE_IN')}`),
             ).toISOString(),
           });
-          return accessToken;
-        case 'refresh':
+          const cookieString = `Refresh=${accessToken}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRE_IN')}; SameSite=None; Secure`;
+          return cookieString;
+        }
+        case 'refresh': {
           const refreshToken = await this.jwtService.signAsync(
             {
               sub: user._id,
@@ -238,12 +240,15 @@ export class AuthService {
               expiresIn: `${this.configService.get<string>('JWT_REFRESH_EXPIRE_IN')}s`,
             },
           );
-          return refreshToken;
-        default:
+          const cookieString = `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_REFRESH_EXPIRE_IN')}; SameSite=None; Secure`;
+          return cookieString;
+        }
+        default: {
           throw new Error('Invalid type');
+        }
       }
     } catch (error) {
-      console.error('!!! ERROR: Error at auth.service.generateToken');
+      console.error('!!! ERROR: Error at auth.service.generateToken', error);
       throw new CustomRpcException('Failed to generate token', 400, {
         field: 'system-error',
         message: 'system-error',
