@@ -5,6 +5,7 @@ import {
   Inject,
   Param,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
@@ -19,6 +20,7 @@ import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import JwtRefreshGuard from 'src/shared/guards/jwt-refresh.guard';
 import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
+import RequestWithUser from 'src/shared/interfaces/request-with-user.interface';
 
 @ApiBearerAuth()
 @Controller('auth')
@@ -40,10 +42,14 @@ export class AuthController {
 
   @Public()
   @Post('sign-in')
-  async login(@Body() signInDto: SignInDto) {
+  async login(@Body() signInDto: SignInDto, @Req() request: RequestWithUser) {
     const response = await firstValueFrom(
       this.client.send('auth.login', signInDto),
     );
+    const {accessToken, refreshToken} = response
+    request.res.setHeader('Set-Cookie', [ accessToken, refreshToken ])
+    response.accessToken = undefined
+    response.refreshToken = undefined
     return response;
   }
 

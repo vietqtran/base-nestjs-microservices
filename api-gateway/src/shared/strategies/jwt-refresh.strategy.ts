@@ -23,7 +23,10 @@ export class JwtRefreshStrategy extends PassportStrategy(
     private readonly authClient: ClientKafka,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
+      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
+        return request?.cookies?.Refresh;
+      }]),
+      ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_REFRESH_SECRET'),
       passReqToCallback: true,
     });

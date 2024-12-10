@@ -217,7 +217,7 @@ export class AuthService {
                 parseInt(`${this.configService.get<string>('JWT_EXPIRE_IN')}`),
             ).toISOString(),
           });
-          const cookieString = `Refresh=${accessToken}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRE_IN')}; SameSite=None; Secure`;
+          const cookieString = `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRE_IN')}; SameSite=None; Secure`;
           return cookieString;
         }
         case 'refresh': {
