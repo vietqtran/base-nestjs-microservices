@@ -17,7 +17,7 @@ export class Session {
   user_id: string;
 
   @Prop({ required: true, index: true })
-  hashed_refresh_token: string;
+  refresh_token: string;
 
   @Prop({ required: false })
   ip?: string;

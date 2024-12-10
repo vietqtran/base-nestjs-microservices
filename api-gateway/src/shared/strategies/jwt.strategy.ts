@@ -16,12 +16,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly usersService: ClientKafka,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        return request?.cookies?.Authentication;
-      }]),
-      ignoreExpiration: false,
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          return request?.cookies?.Authentication;
+        },
+      ]),
       secretOrKey: configService.get<string>('JWT_SECRET'),
-      passReqToCallback: true,
     });
   }
 

@@ -13,10 +13,8 @@ import { firstValueFrom } from 'rxjs';
 import { CreateUserDto } from 'src/services/users-service/dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/object-id.pipe';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
 
-@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(

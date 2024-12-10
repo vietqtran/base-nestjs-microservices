@@ -23,9 +23,11 @@ export class JwtRefreshStrategy extends PassportStrategy(
     private readonly authClient: ClientKafka,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        return request?.cookies?.Refresh;
-      }]),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          return request?.cookies?.Refresh;
+        },
+      ]),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_REFRESH_SECRET'),
       passReqToCallback: true,
@@ -33,7 +35,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
   }
 
   async validate(req: Request, payload: TokenPayload) {
-    const refreshToken = req.body.refreshToken;
     const session = await firstValueFrom(
       this.authClient.send('auth.get-session-by-id', payload.sessionId),
     );
@@ -44,16 +45,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
       throw new CustomRpcException('Invalid token', 400, {
         field: 'token',
         message: 'invalid',
-      });
-    }
-    const isMatched = await argon2.verify(
-      session.hashed_refresh_token,
-      refreshToken,
-    );
-    if (!isMatched) {
-      throw new CustomRpcException('Invalid token', 400, {
-        field: 'token',
-        message: 'not-match',
       });
     }
 

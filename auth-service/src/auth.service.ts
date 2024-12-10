@@ -82,11 +82,13 @@ export class AuthService {
       { user, sessionId },
       'refresh',
     );
-    const hashedRefreshToken = await argon2.hash(refreshToken);
+    const accessTokenCookie = this.generateCookie(accessToken, 'access');
+    const refreshTokenCookie = this.generateCookie(refreshToken, 'refresh');
+
     const sessionData = {
       _id: sessionId,
       user_id: user._id,
-      hashed_refresh_token: hashedRefreshToken,
+      refresh_token: refreshToken,
       ip: session.ip,
       ua: session.ua,
     };
@@ -102,8 +104,8 @@ export class AuthService {
 
     return {
       user,
-      accessToken,
-      refreshToken,
+      accessToken: accessTokenCookie,
+      refreshToken: refreshTokenCookie,
     };
   }
 
@@ -189,16 +191,18 @@ export class AuthService {
       'refresh',
     );
 
-    const hashRefreshToken = await argon2.hash(refreshToken);
+    const accessTokenCookie = this.generateCookie(accessToken, 'access');
+    const refreshTokenCookie = this.generateCookie(refreshToken, 'refresh');
+
     await this.sessionModel.updateOne(
       { _id: sessionId },
-      { hashed_refresh_token: hashRefreshToken },
+      { refresh_token: refreshToken },
     );
 
     return {
       user,
-      accessToken,
-      refreshToken,
+      accessToken: accessTokenCookie,
+      refreshToken: refreshTokenCookie,
     };
   }
 
@@ -217,8 +221,7 @@ export class AuthService {
                 parseInt(`${this.configService.get<string>('JWT_EXPIRE_IN')}`),
             ).toISOString(),
           });
-          const cookieString = `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRE_IN')}; SameSite=None; Secure`;
-          return cookieString;
+          return accessToken;
         }
         case 'refresh': {
           const refreshToken = await this.jwtService.signAsync(
@@ -240,8 +243,7 @@ export class AuthService {
               expiresIn: `${this.configService.get<string>('JWT_REFRESH_EXPIRE_IN')}s`,
             },
           );
-          const cookieString = `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_REFRESH_EXPIRE_IN')}; SameSite=None; Secure`;
-          return cookieString;
+          return refreshToken;
         }
         default: {
           throw new Error('Invalid type');
@@ -254,6 +256,13 @@ export class AuthService {
         message: 'system-error',
       });
     }
+  }
+
+  generateCookie(token: string, type: 'access' | 'refresh') {
+    if (type === 'access') {
+      return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRE_IN')}; SameSite=None; Secure`;
+    }
+    return `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_REFRESH_EXPIRE_IN')}; SameSite=None; Secure`;
   }
 
   async getSessionById(sessionId: string) {

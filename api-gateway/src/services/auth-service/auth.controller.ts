@@ -15,14 +15,11 @@ import { SignUpDto } from './dtos/sign-up.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/object-id.pipe';
 import { ValidateDto } from './dtos/validate.dto';
 import { Public } from 'src/shared/decorators/public.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
-import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import JwtRefreshGuard from 'src/shared/guards/jwt-refresh.guard';
 import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
 import RequestWithUser from 'src/shared/interfaces/request-with-user.interface';
 
-@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -46,10 +43,10 @@ export class AuthController {
     const response = await firstValueFrom(
       this.client.send('auth.login', signInDto),
     );
-    const {accessToken, refreshToken} = response
-    request.res.setHeader('Set-Cookie', [ accessToken, refreshToken ])
-    response.accessToken = undefined
-    response.refreshToken = undefined
+    const { accessToken, refreshToken } = response;
+    request.res.setHeader('Set-Cookie', [accessToken, refreshToken]);
+    response.accessToken = undefined;
+    response.refreshToken = undefined;
     return response;
   }
 
@@ -67,7 +64,7 @@ export class AuthController {
   @Post('refresh-token')
   async refreshToken(
     @CurrentUser() payload: any,
-    @Body() refreshTokenDto: RefreshTokenDto,
+    @Req() request: RequestWithUser,
   ) {
     const response = await firstValueFrom(
       this.client.send('auth.refresh-token', {
@@ -75,6 +72,10 @@ export class AuthController {
         sessionId: payload.sessionId,
       }),
     );
+    const { accessToken, refreshToken } = response;
+    request.res.setHeader('Set-Cookie', [accessToken, refreshToken]);
+    response.accessToken = undefined;
+    response.refreshToken = undefined;
     return response;
   }
 
