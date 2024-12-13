@@ -14,7 +14,7 @@ export class IdentityService {
     @Inject('USERS_SERVICE') private readonly usersClient: ClientKafka,
   ) {}
 
-  async createRole(createRoleDto: CreateRoleDto): Promise<Role> {
+  async createRole(createRoleDto: CreateRoleDto) {
     const existedRole = await this.roleModel.findOne({
       $or: [{ key: createRoleDto.key }, { role_name: createRoleDto.role_name }],
     });
@@ -25,13 +25,11 @@ export class IdentityService {
       });
     }
     try {
-      console.log('createRoleDto', createRoleDto);
-      const role = await this.roleModel.create({
+      return await this.roleModel.create({
         key: createRoleDto.key,
         role_name: createRoleDto.role_name,
         description: createRoleDto.description,
       });
-      return role;
     } catch (error) {
       console.error(
         '!!! ERROR: Error at identity.service.createRole - create role',

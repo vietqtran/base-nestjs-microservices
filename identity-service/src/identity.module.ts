@@ -31,7 +31,7 @@ import { Role, RoleSchema } from './schemas/role.schema';
               brokers: [config.get<string>('KAFKA_BROKER_URL')],
             },
             consumer: {
-              groupId: 'users-service-consumer-group',
+              groupId: 'identity-service-users-service-consumer-group',
             },
           },
         }),

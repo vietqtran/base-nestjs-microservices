@@ -1,30 +1,24 @@
 export enum CLIENT_NAMES {
-  API_GATEWAY = 'API_GATEWAY',
   USERS_SERVICE = 'USERS_SERVICE',
   AUTH_SERVICE = 'AUTH_SERVICE',
   IDENTITY_SERVICE = 'IDENTITY_SERVICE',
 }
 
 export const CLIENT_KAFKA_OPTIONS = {
-  apiGateway: {
-    name: CLIENT_NAMES.API_GATEWAY,
-    clientId: 'api-gateway',
-    groupId: 'api-gateway-consumer-group',
-  },
   users: {
     name: CLIENT_NAMES.USERS_SERVICE,
     clientId: 'api-gateway-users-service',
-    groupId: 'users-consumer-group',
+    groupId: 'api-gateway-users-service-consumer-group',
   },
   auth: {
     name: CLIENT_NAMES.AUTH_SERVICE,
     clientId: 'api-gateway-auth-service',
-    groupId: 'auth-consumer-group',
+    groupId: 'api-gateway-auth-service-consumer-group',
   },
   identity: {
     name: CLIENT_NAMES.IDENTITY_SERVICE,
     clientId: 'api-gateway-identity-service',
-    groupId: 'identity-consumer-group',
+    groupId: 'api-gateway-identity-service-consumer-group',
   },
 };
 

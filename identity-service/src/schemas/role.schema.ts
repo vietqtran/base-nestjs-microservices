@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
 
 @Schema({
@@ -9,6 +10,9 @@ import { IsString } from 'class-validator';
   versionKey: false,
 })
 export class Role {
+  @Transform(({ value }) => value.toString())
+  _id: string;
+
   @IsString()
   @Prop({ required: true, unique: true })
   key: string;

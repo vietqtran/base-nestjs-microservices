@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
-import { firstValueFrom } from 'rxjs';
+import { first, firstValueFrom, timeout } from 'rxjs';
 import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
 import { CreateRoleDto } from './dtos/create-role.dto';
 import { UpdateUserRoleDto } from './dtos/update-user-role.dto';
@@ -33,7 +33,11 @@ export class IdentityController {
   @Post('roles')
   async createRole(@Body() createRoleDto: CreateRoleDto) {
     const response = await firstValueFrom(
-      this.identityClient.send('identity.create-role', { createRoleDto }),
+      this.identityClient
+        .send('identity.create-role', {
+          createRoleDto,
+        })
+        .pipe(timeout(10000)),
     );
     return response;
   }

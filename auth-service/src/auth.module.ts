@@ -49,7 +49,7 @@ import { JwtModule } from '@nestjs/jwt';
               brokers: [config.get<string>('KAFKA_BROKER_URL')],
             },
             consumer: {
-              groupId: 'users-service-consumer-group',
+              groupId: 'auth-service-users-service-consumer-group',
             },
           },
         }),
