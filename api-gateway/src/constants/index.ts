@@ -8,17 +8,17 @@ export const CLIENT_KAFKA_OPTIONS = {
   users: {
     name: CLIENT_NAMES.USERS_SERVICE,
     clientId: 'api-gateway-users-service',
-    groupId: 'api-gateway-users-service-consumer-group',
+    groupId: 'users-service-consumer-group',
   },
   auth: {
     name: CLIENT_NAMES.AUTH_SERVICE,
     clientId: 'api-gateway-auth-service',
-    groupId: 'api-gateway-auth-service-consumer-group',
+    groupId: 'auth-service-consumer-group',
   },
   identity: {
     name: CLIENT_NAMES.IDENTITY_SERVICE,
     clientId: 'api-gateway-identity-service',
-    groupId: 'api-gateway-identity-service-consumer-group',
+    groupId: 'identity-service-consumer-group',
   },
 };
 

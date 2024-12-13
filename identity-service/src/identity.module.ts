@@ -58,4 +58,8 @@ export class IdentityModule {
     await this.usersClient.connect();
     console.log('Connected to Kafka');
   }
+
+  async onModuleDestroy() {
+    await this.usersClient.close();
+  }
 }

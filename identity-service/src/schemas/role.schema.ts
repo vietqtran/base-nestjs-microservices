@@ -14,11 +14,11 @@ export class Role {
   _id: string;
 
   @IsString()
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   key: string;
 
   @IsString()
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   role_name: string;
 
   @IsString()

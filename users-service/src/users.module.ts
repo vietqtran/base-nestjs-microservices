@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientsModule } from '@nestjs/microservices';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User, UserSchema } from './schemas/user.schema';
@@ -28,5 +28,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 export class UsersModule {
   async onModuleInit() {
     console.log('UsersModule initialized');
+  }
+
+  async onModuleDestroy() {
+    console.log('UsersModule destroyed');
   }
 }

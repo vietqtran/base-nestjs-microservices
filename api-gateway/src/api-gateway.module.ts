@@ -9,7 +9,7 @@ import { LocalStrategy } from './shared/strategies/local.strategy';
 import { JwtStrategy } from './shared/strategies/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
 import { JwtRefreshStrategy } from './shared/strategies/jwt-refresh.strategy';
-import { IdentityController } from './services/identity/identity.controller';
+import { IdentityController } from './services/identity-service/identity.controller';
 
 dotenv.config();
 
@@ -117,5 +117,11 @@ export class ApiGatewayModule {
     ]);
 
     console.log('All Kafka clients connected and topics registered.');
+  }
+
+  async onModuleDestroy() {
+    await this.usersClient.close();
+    await this.authClient.close();
+    await this.identityClient.close();
   }
 }

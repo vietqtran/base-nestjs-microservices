@@ -2,15 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
 export class CreateRoleDto {
-  @ApiProperty()
+  @ApiProperty({ example: 'ADMIN' })
   @IsString()
   key: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'Administrator',
+  })
   @IsString()
   role_name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'Administrator',
+  })
   @IsString()
   description: string;
 }
