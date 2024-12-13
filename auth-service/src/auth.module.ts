@@ -2,7 +2,6 @@ import { Inject, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as dotenv from 'dotenv';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import {
@@ -12,22 +11,17 @@ import {
 import { Session, SessionSchema } from './schemas/session.schema';
 import { JwtModule } from '@nestjs/jwt';
 
-dotenv.config();
-
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [],
       isGlobal: true,
       expandVariables: true,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (config: ConfigService) => {
-        return {
-          uri: config.get<string>('MONGO_URI'),
-        };
-      },
+      useFactory: (config: ConfigService) => ({
+        uri: config.get<string>('MONGO_URI'),
+      }),
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([
@@ -44,32 +38,22 @@ dotenv.config();
         },
       }),
     }),
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            clientId: 'auth-service',
-            brokers: [process.env.KAFKA_BROKER_URL],
-          },
-          consumer: {
-            groupId: 'auth-consumer-group',
-          },
-        },
-      },
+    ClientsModule.registerAsync([
       {
         name: 'USERS_SERVICE',
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            clientId: 'users-service',
-            brokers: [process.env.KAFKA_BROKER_URL],
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              clientId: 'auth-service-users-service',
+              brokers: [config.get<string>('KAFKA_BROKER_URL')],
+            },
+            consumer: {
+              groupId: 'users-service-consumer-group',
+            },
           },
-          consumer: {
-            groupId: 'users-consumer-group',
-          },
-        },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],
@@ -81,12 +65,19 @@ export class AuthModule {
     @Inject('USERS_SERVICE') private readonly usersClient: ClientKafka,
   ) {}
 
-  async onModuleInit() {
-    const topics = ['users.get-by-id', 'users.get-by-filter', 'users.create'];
-    topics.forEach((topic) => this.usersClient.subscribeToResponseOf(topic));
+  private readonly topics = [
+    'users.get-by-id',
+    'users.get-by-filter',
+    'users.create',
+  ];
 
-    Promise.all([this.usersClient.connect()]).then(() => {
-      console.log('Connected to Kafka');
+  async onModuleInit() {
+    this.topics.forEach((topic) => {
+      this.usersClient.subscribeToResponseOf(topic);
+      console.log(`Subscribed to topic: ${topic}`);
     });
+
+    await this.usersClient.connect();
+    console.log('Connected to Kafka');
   }
 }

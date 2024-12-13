@@ -26,7 +26,8 @@
       "token": "token",
       "user": "người dùng",
       "username": "tên người dùng",
-      "session": "phiên đăng nhập"
+      "session": "phiên đăng nhập",
+      "role": "Vai trò"
     }
   }
 }

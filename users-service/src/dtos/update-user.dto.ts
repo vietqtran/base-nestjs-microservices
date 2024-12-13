@@ -28,5 +28,6 @@ export class UpdateUserDto {
         address_line_2?: string;
       };
     };
+    roles?: string[];
   };
 }

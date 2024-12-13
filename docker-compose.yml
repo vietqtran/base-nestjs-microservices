@@ -1,46 +1,46 @@
-version: '3'
+version: "3"
 services:
-   zookeeper:
-      image: confluentinc/cp-zookeeper:latest
-      restart: always
-      environment:
-         ZOOKEEPER_CLIENT_PORT: 2181
-         ZOOKEEPER_TICK_TIME: 2000
-      ports:
-         - '2181:2181'
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
 
-   kafka:
-      image: confluentinc/cp-kafka:latest
-      restart: always
-      depends_on:
-         - zookeeper
-      ports:
-         - '9092:9092'
-      environment:
-         KAFKA_BROKER_ID: 1
-         KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-         KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-         KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-         KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-   mongodb:
-      image: mongo:latest
-      restart: always
-      ports:
-         - '27017:27017'
-      environment:
-         MONGO_INITDB_ROOT_USERNAME: username
-         MONGO_INITDB_ROOT_PASSWORD: password
-         ME_CONFIG_MONGODB_URL: mongodb://localhost:27017/
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://localhost:27017/
 
-   redis:
-      image: redis:latest
-      restart: always
-      ports:
-         - '6379:6379'
-      command: redis-server --requirepass password
-      environment:
-         REDIS_PASSWORD: password
-         REDIS_PORT: 6379
-         REDIS_DB: 0
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass password
+    environment:
+      REDIS_PASSWORD: password
+      REDIS_PORT: 6379
+      REDIS_DB: 0

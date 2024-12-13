@@ -8,7 +8,6 @@ import { firstValueFrom } from 'rxjs';
 import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
 import { ClientKafka } from '@nestjs/microservices';
 import { CustomRpcException } from '../exceptions/custom-rpc.exception';
-import * as argon2 from 'argon2';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(

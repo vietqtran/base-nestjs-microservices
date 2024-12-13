@@ -26,7 +26,8 @@
       "token": "トークン",
       "user": "ユーザー",
       "username": "ユーザー名",
-      "session": "セッション"
+      "session": "セッション",
+      "role": "ロール"
     }
   }
 }

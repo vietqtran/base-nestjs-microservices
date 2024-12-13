@@ -26,7 +26,8 @@
       "token": "token",
       "user": "user",
       "username": "username",
-      "session": "session"
+      "session": "session",
+      "role": "role"
     }
   }
 }

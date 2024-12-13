@@ -9,6 +9,7 @@ import { LocalStrategy } from './shared/strategies/local.strategy';
 import { JwtStrategy } from './shared/strategies/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
 import { JwtRefreshStrategy } from './shared/strategies/jwt-refresh.strategy';
+import { IdentityController } from './services/identity/identity.controller';
 
 dotenv.config();
 
@@ -62,7 +63,7 @@ dotenv.config();
     ]),
     I18nConfigModule,
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, IdentityController],
   providers: [LocalStrategy, JwtStrategy, JwtRefreshStrategy],
 })
 export class ApiGatewayModule {
@@ -75,15 +76,16 @@ export class ApiGatewayModule {
     private readonly identityClient: ClientKafka,
   ) {}
 
-  async onModuleInit() {
-    const usersTopics = [
+  private readonly topics = {
+    users: [
       'users.get-all',
       'users.create',
       'users.update',
       'users.delete',
       'users.get-by-id',
-    ];
-    const authTopics = [
+      'users.get-by-filter',
+    ],
+    auth: [
       'auth.validate-user',
       'auth.login',
       'auth.sign-up',
@@ -91,19 +93,29 @@ export class ApiGatewayModule {
       'auth.get-session-by-id',
       'auth.get-all-user-credentials',
       'auth.get-all-sessions',
-    ];
-    const identityTopics = []
+    ],
+    identity: [
+      'identity.get-all-permissions',
+      'identity.create-role',
+      'identity.update-role',
+    ],
+  };
 
-    usersTopics.forEach((topic) =>
-      this.usersClient.subscribeToResponseOf(topic),
-    );
-    authTopics.forEach((topic) => this.authClient.subscribeToResponseOf(topic));
-    identityTopics.forEach((topic) => this.identityClient.subscribeToResponseOf(topic));
+  async onModuleInit() {
+    const registerTopics = async (client: ClientKafka, topics: string[]) => {
+      topics.forEach((topic) => {
+        client.subscribeToResponseOf(topic);
+        console.log(`Subscribed to topic: ${topic}`);
+      });
+      await client.connect();
+    };
 
-    Promise.all([this.usersClient.connect(), this.authClient.connect(), this.identityClient.connect()]).then(
-      () => {
-        console.log('Connected to Kafka');
-      },
-    );
+    await Promise.all([
+      registerTopics(this.usersClient, this.topics.users),
+      registerTopics(this.authClient, this.topics.auth),
+      registerTopics(this.identityClient, this.topics.identity),
+    ]);
+
+    console.log('All Kafka clients connected and topics registered.');
   }
 }

@@ -26,7 +26,8 @@
       "token": "令牌",
       "user": "用户",
       "username": "用户名",
-      "session": "会话"
+      "session": "会话",
+      "role": "角色"
     }
   }
 }

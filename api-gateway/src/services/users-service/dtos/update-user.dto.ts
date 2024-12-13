@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsObject, IsString } from 'class-validator';
+import { IsArray, IsObject, IsString } from 'class-validator';
 
 export class UpdateUserProfileDto {
   @ApiProperty()
@@ -101,4 +101,8 @@ export class UpdateUserDto {
   @ApiProperty()
   @IsObject()
   address?: UpdateUserAddressDto;
+
+  @ApiProperty()
+  @IsArray()
+  roles?: string[];
 }

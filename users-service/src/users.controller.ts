@@ -1,8 +1,4 @@
-import {
-  ClassSerializerInterceptor,
-  Controller,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
