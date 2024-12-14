@@ -22,7 +22,7 @@ async function bootstrap() {
           },
         },
         consumer: {
-          groupId: 'users-service-consumer-group',
+          groupId: 'users-service-consumer',
           allowAutoTopicCreation: true,
           sessionTimeout: 30000,
         },

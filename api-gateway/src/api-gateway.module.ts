@@ -1,7 +1,6 @@
-import { Inject, Module } from '@nestjs/common';
-import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
+import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UsersController } from './services/users-service/users.controller';
-import { CLIENT_KAFKA_OPTIONS } from './constants';
 import * as dotenv from 'dotenv';
 import { I18nConfigModule } from './i18n/i18n.module';
 import { AuthController } from './services/auth-service/auth.controller';
@@ -22,41 +21,62 @@ dotenv.config();
     }),
     ClientsModule.register([
       {
-        name: CLIENT_KAFKA_OPTIONS.users.name,
+        name: 'AUTH_SERVICE',
         transport: Transport.KAFKA,
         options: {
           client: {
-            clientId: CLIENT_KAFKA_OPTIONS.users.clientId,
+            clientId: 'auth-service',
             brokers: [process.env.KAFKA_BROKER_URL],
+            connectionTimeout: 5000,
+            retry: {
+              initialRetryTime: 1000,
+              retries: 5,
+            },
           },
           consumer: {
-            groupId: CLIENT_KAFKA_OPTIONS.users.groupId,
+            groupId: 'auth-service-consumer',
+            allowAutoTopicCreation: true,
+            sessionTimeout: 30000,
           },
         },
       },
       {
-        name: CLIENT_KAFKA_OPTIONS.auth.name,
+        name: 'USERS_SERVICE',
         transport: Transport.KAFKA,
         options: {
           client: {
-            clientId: CLIENT_KAFKA_OPTIONS.auth.clientId,
+            clientId: 'users-service',
             brokers: [process.env.KAFKA_BROKER_URL],
+            connectionTimeout: 5000,
+            retry: {
+              initialRetryTime: 1000,
+              retries: 5,
+            },
           },
           consumer: {
-            groupId: CLIENT_KAFKA_OPTIONS.auth.groupId,
+            groupId: 'users-service-consumer',
+            allowAutoTopicCreation: true,
+            sessionTimeout: 30000,
           },
         },
       },
       {
-        name: CLIENT_KAFKA_OPTIONS.identity.name,
+        name: 'IDENTITY_SERVICE',
         transport: Transport.KAFKA,
         options: {
           client: {
-            clientId: CLIENT_KAFKA_OPTIONS.identity.clientId,
+            clientId: 'identity-service',
             brokers: [process.env.KAFKA_BROKER_URL],
+            connectionTimeout: 5000,
+            retry: {
+              initialRetryTime: 1000,
+              retries: 5,
+            },
           },
           consumer: {
-            groupId: CLIENT_KAFKA_OPTIONS.identity.groupId,
+            groupId: 'identity-service-consumer',
+            allowAutoTopicCreation: true,
+            sessionTimeout: 30000,
           },
         },
       },
@@ -66,62 +86,4 @@ dotenv.config();
   controllers: [UsersController, AuthController, IdentityController],
   providers: [LocalStrategy, JwtStrategy, JwtRefreshStrategy],
 })
-export class ApiGatewayModule {
-  constructor(
-    @Inject(CLIENT_KAFKA_OPTIONS.users.name)
-    private readonly usersClient: ClientKafka,
-    @Inject(CLIENT_KAFKA_OPTIONS.auth.name)
-    private readonly authClient: ClientKafka,
-    @Inject(CLIENT_KAFKA_OPTIONS.identity.name)
-    private readonly identityClient: ClientKafka,
-  ) {}
-
-  private readonly topics = {
-    users: [
-      'users.get-all',
-      'users.create',
-      'users.update',
-      'users.delete',
-      'users.get-by-id',
-      'users.get-by-filter',
-    ],
-    auth: [
-      'auth.validate-user',
-      'auth.login',
-      'auth.sign-up',
-      'auth.refresh-token',
-      'auth.get-session-by-id',
-      'auth.get-all-user-credentials',
-      'auth.get-all-sessions',
-    ],
-    identity: [
-      'identity.get-all-permissions',
-      'identity.create-role',
-      'identity.update-role',
-    ],
-  };
-
-  async onModuleInit() {
-    const registerTopics = async (client: ClientKafka, topics: string[]) => {
-      topics.forEach((topic) => {
-        client.subscribeToResponseOf(topic);
-        console.log(`Subscribed to topic: ${topic}`);
-      });
-      await client.connect();
-    };
-
-    await Promise.all([
-      registerTopics(this.usersClient, this.topics.users),
-      registerTopics(this.authClient, this.topics.auth),
-      registerTopics(this.identityClient, this.topics.identity),
-    ]);
-
-    console.log('All Kafka clients connected and topics registered.');
-  }
-
-  async onModuleDestroy() {
-    await this.usersClient.close();
-    await this.authClient.close();
-    await this.identityClient.close();
-  }
-}
+export class ApiGatewayModule {}

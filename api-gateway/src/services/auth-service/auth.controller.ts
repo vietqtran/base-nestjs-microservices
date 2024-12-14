@@ -24,7 +24,7 @@ import RequestWithUser from 'src/shared/interfaces/request-with-user.interface';
 export class AuthController {
   constructor(
     @Inject(CLIENT_KAFKA_OPTIONS.auth.name)
-    private readonly client: ClientKafka,
+    private readonly authClient: ClientKafka,
   ) {}
 
   @Public()
@@ -32,7 +32,7 @@ export class AuthController {
   async validateUser(@Body() validateDto: ValidateDto) {
     const { email, password } = validateDto;
     const response = await firstValueFrom(
-      this.client.send('auth.validate-user', { email, password }),
+      this.authClient.send('auth.validate-user', { email, password }),
     );
     return response;
   }
@@ -41,7 +41,7 @@ export class AuthController {
   @Post('sign-in')
   async login(@Body() signInDto: SignInDto, @Req() request: RequestWithUser) {
     const response = await firstValueFrom(
-      this.client.send('auth.login', signInDto),
+      this.authClient.send('auth.login', signInDto),
     );
     const { accessToken, refreshToken } = response;
     request.res.setHeader('Set-Cookie', [accessToken, refreshToken]);
@@ -54,7 +54,7 @@ export class AuthController {
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
     const response = await firstValueFrom(
-      this.client.send('auth.sign-up', signUpDto),
+      this.authClient.send('auth.sign-up', signUpDto),
     );
     return response;
   }
@@ -67,7 +67,7 @@ export class AuthController {
     @Req() request: RequestWithUser,
   ) {
     const response = await firstValueFrom(
-      this.client.send('auth.refresh-token', {
+      this.authClient.send('auth.refresh-token', {
         userId: payload.userId,
         sessionId: payload.sessionId,
       }),
@@ -82,7 +82,7 @@ export class AuthController {
   @Post('session/:id')
   async getSessionById(@Param('id', ParseObjectIdPipe) sessionId: string) {
     const response = await firstValueFrom(
-      this.client.send('auth.get-session-by-id', sessionId),
+      this.authClient.send('auth.get-session-by-id', sessionId),
     );
     return response;
   }
@@ -90,7 +90,7 @@ export class AuthController {
   @Get('sessions')
   async getAllSessions() {
     const sessions = await firstValueFrom(
-      this.client.send('auth.get-all-sessions', {}),
+      this.authClient.send('auth.get-all-sessions', {}),
     );
     return sessions;
   }
@@ -98,8 +98,33 @@ export class AuthController {
   @Get('user-credentials')
   async getAllUserCredentials() {
     const response = await firstValueFrom(
-      this.client.send('auth.get-all-user-credentials', {}),
+      this.authClient.send('auth.get-all-user-credentials', {}),
     );
     return response;
+  }
+
+  async onModuleInit() {
+    const topics = [
+      'auth.validate-user',
+      'auth.login',
+      'auth.sign-up',
+      'auth.refresh-token',
+      'auth.get-session-by-id',
+      'auth.get-all-user-credentials',
+      'auth.get-all-sessions',
+    ];
+
+    for (const topic of topics) {
+      this.authClient.subscribeToResponseOf(topic);
+      console.log(`Subscribed to topic: ${topic}`);
+    }
+
+    await this.authClient.connect();
+    console.log('Connected to Kafka');
+  }
+
+  async onModuleDestroy() {
+    await this.authClient.close();
+    console.log('Disconnected from Kafka');
   }
 }

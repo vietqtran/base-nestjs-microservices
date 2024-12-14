@@ -32,9 +32,11 @@ export class IdentityController {
 
   @Post('roles')
   async createRole(@Body() createRoleDto: CreateRoleDto) {
-    const response = await firstValueFrom(
-      this.identityClient.send('identity.create-role', createRoleDto),
-    );
+    const [response] = await Promise.all([
+      firstValueFrom(
+        this.identityClient.send('identity.create-role', createRoleDto),
+      ),
+    ]);
     return response;
   }
 
@@ -43,12 +45,35 @@ export class IdentityController {
     @Param('userId', ParseObjectIdPipe) userId: string,
     @Body() updateUserRoleDto: UpdateUserRoleDto,
   ) {
-    const response = await firstValueFrom(
-      this.identityClient.send('identity.update-role', {
-        userId,
-        roleKeys: [...updateUserRoleDto.roleKeys],
-      }),
-    );
+    const [response] = await Promise.all([
+      firstValueFrom(
+        this.identityClient.send('identity.update-role', {
+          userId,
+          roleKeys: [...updateUserRoleDto.roleKeys],
+        }),
+      ),
+    ]);
     return response;
+  }
+
+  async onModuleInit() {
+    const topics = [
+      'identity.get-all-permissions',
+      'identity.create-role',
+      'identity.update-role',
+    ];
+
+    for (const topic of topics) {
+      this.identityClient.subscribeToResponseOf(topic);
+      console.log(`Subscribed to topic: ${topic}`);
+    }
+
+    await this.identityClient.connect();
+    console.log('Connected to Kafka');
+  }
+
+  async onModuleDestroy() {
+    await this.identityClient.close();
+    console.log('Disconnected from Kafka');
   }
 }

@@ -1,6 +1,6 @@
 import { Inject, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientKafka } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -38,24 +38,6 @@ import { JwtModule } from '@nestjs/jwt';
         },
       }),
     }),
-    ClientsModule.registerAsync([
-      {
-        name: 'USERS_SERVICE',
-        useFactory: (config: ConfigService) => ({
-          transport: Transport.KAFKA,
-          options: {
-            client: {
-              clientId: 'auth-service-users-service',
-              brokers: [config.get<string>('KAFKA_BROKER_URL')],
-            },
-            consumer: {
-              groupId: 'auth-service-users-service-consumer-group',
-            },
-          },
-        }),
-        inject: [ConfigService],
-      },
-    ]),
   ],
   controllers: [AuthController],
   providers: [AuthService],

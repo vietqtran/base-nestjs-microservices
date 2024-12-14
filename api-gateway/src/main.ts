@@ -27,7 +27,7 @@ async function bootstrap() {
         },
       },
       consumer: {
-        groupId: 'api-gateway-consumer-group',
+        groupId: 'api-gateway-consumer',
         allowAutoTopicCreation: true,
         sessionTimeout: 30000,
       },

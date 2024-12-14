@@ -19,13 +19,13 @@ import { CLIENT_KAFKA_OPTIONS } from 'src/constants';
 export class UsersController {
   constructor(
     @Inject(CLIENT_KAFKA_OPTIONS.users.name)
-    private readonly client: ClientKafka,
+    private readonly userClient: ClientKafka,
   ) {}
 
   @Get()
   async getAllUsers() {
     const response = await firstValueFrom(
-      this.client.send('users.get-all', {}),
+      this.userClient.send('users.get-all', {}),
     );
     return response;
   }
@@ -33,7 +33,7 @@ export class UsersController {
   @Get(':id')
   async getUserById(@Param('id', ParseObjectIdPipe) id: string) {
     const response = await firstValueFrom(
-      this.client.send('users.get-by-id', id),
+      this.userClient.send('users.get-by-id', id),
     );
     return response;
   }
@@ -41,7 +41,7 @@ export class UsersController {
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
     const response = await firstValueFrom(
-      this.client.send('users.create', createUserDto),
+      this.userClient.send('users.create', createUserDto),
     );
     return response;
   }
@@ -52,14 +52,40 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const response = await firstValueFrom(
-      this.client.send('users.update', { id, payload: updateUserDto }),
+      this.userClient.send('users.update', { id, payload: updateUserDto }),
     );
     return response;
   }
 
   @Delete(':id')
   async deleteUser(@Param('id', ParseObjectIdPipe) id: string) {
-    const response = await firstValueFrom(this.client.send('users.delete', id));
+    const response = await firstValueFrom(
+      this.userClient.send('users.delete', id),
+    );
     return response;
+  }
+
+  async onModuleInit() {
+    const topics = [
+      'users.get-all',
+      'users.create',
+      'users.update',
+      'users.delete',
+      'users.get-by-id',
+      'users.get-by-filter',
+    ];
+
+    for (const topic of topics) {
+      this.userClient.subscribeToResponseOf(topic);
+      console.log(`Subscribed to topic: ${topic}`);
+    }
+
+    await this.userClient.connect();
+    console.log('Connected to Kafka');
+  }
+
+  async onModuleDestroy() {
+    await this.userClient.close();
+    console.log('Disconnected from Kafka');
   }
 }

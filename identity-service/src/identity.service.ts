@@ -44,12 +44,14 @@ export class IdentityService {
 
   async updateRole(userId: string, roleKeys: string[]) {
     try {
-      const user = await firstValueFrom(
-        this.usersClient.send('users.update', {
-          id: userId,
-          payload: { roles: roleKeys },
-        }),
-      );
+      const [user] = await Promise.all([
+        firstValueFrom(
+          this.usersClient.send('users.update', {
+            id: userId,
+            payload: { roles: roleKeys },
+          }),
+        ),
+      ]);
       return user;
     } catch (error) {
       console.error(
