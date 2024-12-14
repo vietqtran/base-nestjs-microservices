@@ -14,7 +14,7 @@ export class IdentityController {
   }
 
   @MessagePattern('identity.create-role')
-  async create(@Payload() { createRoleDto }: { createRoleDto: CreateRoleDto }) {
+  async create(@Payload() createRoleDto: CreateRoleDto) {
     return await this.identityService.createRole(createRoleDto);
   }
 

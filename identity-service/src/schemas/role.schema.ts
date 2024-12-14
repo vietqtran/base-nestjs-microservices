@@ -15,7 +15,7 @@ export class Role {
 
   @IsString()
   @Prop({ required: true })
-  key: string;
+  role_key: string;
 
   @IsString()
   @Prop({ required: true })

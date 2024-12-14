@@ -15,23 +15,21 @@ export class IdentityService {
   ) {}
 
   async createRole(createRoleDto: CreateRoleDto) {
-    // const existedRole = await this.roleModel.findOne({
-    //   $or: [{ key: createRoleDto.key }, { role_name: createRoleDto.role_name }],
-    // });
-    // if (existedRole) {
-    //   throw new CustomRpcException('Role existed', 400, {
-    //     field: 'role',
-    //     message: 'existed',
-    //   });
-    // }
-    try {
-      const createdRole = await this.roleModel.create({
-        key: createRoleDto.key,
-        role_name: createRoleDto.role_name,
-        description: createRoleDto.description,
+    const existedRole = await this.roleModel.findOne({
+      $or: [
+        { role_key: createRoleDto.role_key },
+        { role_name: createRoleDto.role_name },
+      ],
+    });
+    if (existedRole) {
+      throw new CustomRpcException('Role existed', 400, {
+        field: 'role',
+        message: 'existed',
       });
-      console.log('createdRole', createdRole);
-      return createdRole;
+    }
+    try {
+      const createdRole = await this.roleModel.create(createRoleDto);
+      return createdRole.toObject();
     } catch (error) {
       console.error(
         '!!! ERROR: Error at identity.service.createRole - create role',

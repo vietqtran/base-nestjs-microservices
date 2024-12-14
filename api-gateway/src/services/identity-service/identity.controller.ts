@@ -33,9 +33,7 @@ export class IdentityController {
   @Post('roles')
   async createRole(@Body() createRoleDto: CreateRoleDto) {
     const response = await firstValueFrom(
-      this.identityClient.send('identity.create-role', {
-        createRoleDto,
-      }),
+      this.identityClient.send('identity.create-role', createRoleDto),
     );
     return response;
   }
